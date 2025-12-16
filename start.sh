@@ -11,13 +11,28 @@ trap cleanup SIGINT SIGTERM
 
 echo "Setting up Backend..."
 cd backend
-python3 -m venv venv
-source venv/bin/activate
+
+# Detect Python command
+if command -v python3 &>/dev/null; then
+    PYTHON_CMD=python3
+else
+    PYTHON_CMD=python
+fi
+
+$PYTHON_CMD -m venv venv
+
+# Activate venv (handle Windows/Linux paths)
+if [ -f "venv/Scripts/activate" ]; then
+    source venv/Scripts/activate
+else
+    source venv/bin/activate
+fi
+
 pip install -r requirements.txt
 
 echo "Starting Backend Server..."
 # Run in background
-python main.py &
+$PYTHON_CMD main.py &
 BACKEND_PID=$!
 
 cd ../frontend
